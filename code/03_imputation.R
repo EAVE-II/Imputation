@@ -158,14 +158,12 @@ df_women_imp = complete(imputation_women, 1)
 densityplot(imputation_women)
 ggsave('./output/women_bmi_pdf.png')
 
-
-
 df_imp2 = df_children_imp %>%
   bind_rows(df_men_imp) %>%
   bind_rows(df_women_imp) %>%
-  select(EAVE_LINKNO, sex, age, urban_rural_6cat, simd2020_sc_quintile, ethnicity_18cat, Q_BMI)
+  select(EAVE_LINKNO, urban_rural_6cat, simd2020_sc_quintile, ethnicity_18cat, Q_BMI)
 
 sapply(df_imp2, function(x) sum(is.na(x)))
 
 # Save imputed values
-saveRDS(df_imp2, paste0('./data/df_imp.rds'))
+saveRDS(df_imp, paste0('./data/df_imp.rds'))
