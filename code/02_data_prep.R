@@ -19,7 +19,7 @@ setwd("/conf/EAVE/GPanalysis/analyses/imputation")
 
 df_cohort <- EAVE_LINKNO_refresh %>%
   #For testing
-  #sample_n(10000) %>%
+  #sample_n(1000) %>%
   select(EAVE_LINKNO_old, 
          EAVE_LINKNO,
          EAVE_LINKNO_change,
@@ -43,7 +43,8 @@ df_cohort <- qcovid_feb22 %>%
 df_cohort <- left_join(
   df_cohort,
   qcovid_old %>% 
-    select(EAVE_LINKNO, Q_DIAG_DIABETES_1, Q_DIAG_DIABETES_2), 
+    select(EAVE_LINKNO, Q_DIAG_DIABETES_1, Q_DIAG_DIABETES_2) %>%
+    filter(!duplicated(EAVE_LINKNO)), 
   by = c("EAVE_LINKNO_old" = "EAVE_LINKNO"))
 
 # If they aren't present in the new qcovid extract, take their data from the old qcovid extract  
@@ -67,13 +68,11 @@ df_cohort <- df_cohort %>%
       fct_relevel("No CKD")
   ) 
 
-
-# # Join by EAVE_LINKNO_old, since data pre-dates December 2021
-# df_cohort <- left_join(df_cohort, qcovid_diabetes, by = c("EAVE_LINKNO_old" = "EAVE_LINKNO"))
-
-# Add ethnicity
 df_cohort <- df_cohort %>%
-  left_join(ethnicity, by = "EAVE_LINKNO")
+  left_join(
+    ethnicity %>%
+      filter(!duplicated(EAVE_LINKNO)), 
+    by = "EAVE_LINKNO")
 
 q_names <- grep("Q", names(df_cohort), value = TRUE)
 

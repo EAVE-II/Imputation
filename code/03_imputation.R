@@ -76,9 +76,9 @@ df = df_cohort %>%
 # Carry out imputation
 set.seed(123)
 
-# In the first round of imputation, we will impute ethnicity, urban_rural_6cat and simd2020_sc_quintile
+# In the first round of imputation, we will impute urban_rural_6cat and simd2020_sc_quintile
 # We will not impute Q_BMI
-exclude_vars = c('EAVE_LINKNO', 'age', 'sex', 'Q_BMI')
+exclude_vars = c('EAVE_LINKNO', 'age', 'sex', 'Q_BMI', 'ethnicity_18cat')
 method <- create_method(df, exclude_vars)
 
 predictorMatrix = quickpred(df, exclude = exclude_vars)
@@ -93,7 +93,7 @@ imputation <- mice(
 
 df_imp1 = complete(imputation, 1)
 
-create_freq_table(df, df_imp1, c('ethnicity_18cat', 'urban_rural_6cat', 'simd2020_sc_quintile'))
+create_freq_table(df, df_imp1, c('urban_rural_6cat', 'simd2020_sc_quintile'))
 
 
 
@@ -109,7 +109,7 @@ df_women = df_imp1 %>%
   filter(sex == 'Female', age >= 20)
 
 
-exclude_vars = c('EAVE_LINKNO', 'age', 'sex')
+exclude_vars = c('EAVE_LINKNO', 'age', 'sex', 'ethnicity_18cat')
 method <- create_method(df_imp1, exclude_vars)
 
 predictorMatrix = quickpred(df_imp1, exclude = exclude_vars)
@@ -161,9 +161,9 @@ ggsave('./output/women_bmi_pdf.png')
 df_imp2 = df_children_imp %>%
   bind_rows(df_men_imp) %>%
   bind_rows(df_women_imp) %>%
-  select(EAVE_LINKNO, urban_rural_6cat, simd2020_sc_quintile, ethnicity_18cat, Q_BMI)
+  select(EAVE_LINKNO, urban_rural_6cat, simd2020_sc_quintile, Q_BMI)
 
 sapply(df_imp2, function(x) sum(is.na(x)))
 
 # Save imputed values
-saveRDS(df_imp, paste0('./data/df_imp.rds'))
+saveRDS(df_imp2, paste0('./data/df_imp.rds'))
